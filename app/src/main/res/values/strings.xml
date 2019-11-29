@@ -1,0 +1,53 @@
+<resources>
+    <string name="app_name">Peta Cuaca App</string>
+    <string name="url">http://10.0.2.2/petacuaca/public/</string>
+    <string name="url_local">http://10.0.2.2/petacuaca/public/</string>
+    <string name="url_production">http://petacuaca.husein-it.xyz/</string>
+    <string name="client_id">1</string>
+    <string name="client_secret">rXY1IOzNy5WmIc1cEvKJFE4E6ay7htvXo7KUhkpH</string>
+    <string name="google_api_key">AIzaSyAlecnCIKqVVgTshKPJDb8jrqbgZ4txpDk</string>
+
+    <!--  MainActivity -->
+    <string name="main_login_btn">Masuk</string>
+    <string name="main_register_btn">Daftar</string>
+
+    <!-- RegisterActivity -->
+    <string name="register_subtitle">Daftar</string>
+    <string name="register_name_input">Nama Anda</string>
+    <string name="register_email_input">Surel Anda</string>
+    <string name="register_password_input">Sandi Anda</string>
+    <string name="register_password_confirmation_input">Konfirmasi Sandi Anda</string>
+    <string name="register_register_btn">Daftar</string>
+    <string name="register_login_btn">Sudah punya akun? Login di sini</string>
+
+    <!-- LoginActivity -->
+    <string name="login_subtitle">Masuk</string>
+    <string name="login_email_input">Surel Anda</string>
+    <string name="login_password_input">Sandi Anda</string>
+    <string name="login_login_btn">Masuk</string>
+    <string name="login_reset_btn">Lupa sandi Anda? Klik di sini</string>
+
+    <!-- ResetPasswordActivity -->
+    <string name="reset_subtitle">Atur Ulang Sandi</string>
+    <string name="reset_email_input">Surel Anda</string>
+    <string name="reset_reset_btn">Atur Ulang</string>
+
+    <!-- EmailVerificationActivity -->
+    <string name="verification_subtitle">Verifikasi Surel Anda</string>
+    <string name="verification_text">Anda harus memverifikasi surel Anda untuk menggunakan layanan Peta Cuaca App. Surel verifikasi telah dikirimkan ke Surel Anda. Apabila tidak ada surel masuk, silakan klik tombol Kirim Ulang di bawah ini.</string>
+    <string name="verification_resend_btn">Kirim Ulang</string>
+
+    <!-- InputActivity -->
+    <string name="input_subtitle">Cari Rute</string>
+    <string name="input_name_input">Nama Rute</string>
+    <string name="input_depart_input">Lokasi Keberangkatan Anda</string>
+    <string name="input_destination_input">Lokasi Tujuan Anda</string>
+    <string name="input_depart_time_input">Waktu Keberangkatan Anda</string>
+    <string name="input_arrive_time_input">Waktu Sampai Anda</string>
+    <string name="input_search_btn">Cari Rute</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_maps">Map</string>
+
+</resources>
