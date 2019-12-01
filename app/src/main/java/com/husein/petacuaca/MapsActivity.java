@@ -2,8 +2,12 @@ package com.husein.petacuaca;
 
 import androidx.fragment.app.FragmentActivity;
 
+import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
+import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -11,11 +15,18 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.google.maps.android.PolyUtil;
 
-import static com.husein.petacuaca.Utils.readEncodedPolyLinePointsFromCSV;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, OnMapAndViewReadyListener.OnGlobalLayoutAndMapReadyListener {
+import java.util.ArrayList;
+import java.util.List;
+
+public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
 
@@ -23,6 +34,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -41,80 +53,72 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
      */
     @Override
     public void onMapReady(GoogleMap googleMap) {
+        JSONObject route = null;
+        Double depart_lat = null;
+        Double depart_lng = null;
+        String depart_name = null;
+        Double destination_lat = null;
+        Double destination_lng = null;
+        String destination_name = null;
+
         mMap = googleMap;
 
-        // Add a marker in Sydney and move the camera
-        LatLng sydney = new LatLng(-34, 151);
-        mMap.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+        //set route from intent
+        try {
+            route = new JSONObject(getIntent().getStringExtra("data"));
+            depart_lat = Double.parseDouble(route.getJSONArray("legs").getJSONObject(0).getJSONObject("start_location").getString("lat"));
+            depart_lng = Double.parseDouble(route.getJSONArray("legs").getJSONObject(0).getJSONObject("start_location").getString("lng"));
+            depart_name = route.getJSONArray("legs").getJSONObject(0).getString("start_address");
+            destination_lat = Double.parseDouble(route.getJSONArray("legs").getJSONObject(0).getJSONObject("end_location").getString("lat"));
+            destination_lng = Double.parseDouble(route.getJSONArray("legs").getJSONObject(0).getJSONObject("end_location").getString("lng"));
+            destination_name = route.getJSONArray("legs").getJSONObject(0).getString("end_address");
 
-        moveCameraToWantedArea();
-    }
+            //set up map
+            mMap.getUiSettings().setZoomControlsEnabled(true);
+            mMap.setMinZoomPreference(12);
 
-    /**
-     * Bound values for camera focus on app start.
-     * BOUND1 is the relative coordinates of the bottom-left corner of the bounded area on the map.
-     * BOUND2 is the relative coordinates of the top-right corner of the bounded area on the map.
-     */
-    private static final LatLng BOUND1 = new LatLng(-35.595209, 138.585857);
-    private static final LatLng BOUND2 = new LatLng(-35.494644, 138.805927);
-    /**
-     * Method to move camera to wanted bus area.
-     */
-    private void moveCameraToWantedArea() {
-        mMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
-            @Override
-            public void onMapLoaded() {
-                // Set up the bounds coordinates for the area we want the user's viewpoint to be.
-                LatLngBounds bounds = new LatLngBounds.Builder()
-                        .include(BOUND1)
-                        .include(BOUND2)
-                        .build();
-                // Move the camera now.
-                mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, BOUNDS_PADDING));
+            // Add a marker
+            LatLng depart_loc = new LatLng(depart_lat, depart_lng);
+            LatLng destination_loc = new LatLng(destination_lat, destination_lng);
+            mMap.addMarker(new MarkerOptions().position(depart_loc).title(depart_name));
+            mMap.addMarker(new MarkerOptions().position(destination_loc).title(destination_name));
+            CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(depart_loc, 17);
+            mMap.animateCamera(cameraUpdate);
 
-                // draw all polylines.
-                drawAllPolyLines();
+            //add polyline
+            List<LatLng> list = null;
+            JSONArray overview_polyline = route.getJSONArray("overview_polyline");
+            for (int i = 0; i < overview_polyline.length() ; i++) {
+                Double lat = Double.parseDouble(overview_polyline.getJSONObject(i).getString("lat"));
+                Double lng = Double.parseDouble(overview_polyline.getJSONObject(i).getString("lng"));
+                LatLng point = new LatLng(lat, lng);
+                list.add(point);
             }
-        });
-    }
 
-    /**
-     * Method to draw all poly lines. This will manually draw polylines one by one on the map by calling
-     * addPolyline(PolylineOptions) on a map instance. The parameter passed in is a new PolylineOptions
-     * object which can be configured with details such as line color, line width, clickability, and
-     * a list of coordinates values.
-     */
-    private void drawAllPolyLines() {
-        // Add a blue Polyline.
-        mMap.addPolyline(new PolylineOptions()
-                .color(getResources().getColor(R.color.colorPolyLineBlue)) // Line color.
-                .width(POLYLINE_WIDTH) // Line width.
-                .clickable(false) // Able to click or not.
-                .addAll(readEncodedPolyLinePointsFromCSV(this, LINE_BLUE))); // all the whole list of lat lng value pairs which is retrieved by calling helper method readEncodedPolyLinePointsFromCSV.
-        // Add a violet Polyline.
-        mMap.addPolyline(new PolylineOptions()
-                .color(getResources().getColor(R.color.colorPolyLineViolet))
-                .width(POLYLINE_WIDTH)
-                .clickable(false)
-                .addAll(readEncodedPolyLinePointsFromCSV(this, LINE_VIOLET)));
-        // Add an orange Polyline.
-        mMap.addPolyline(new PolylineOptions()
-                .color(getResources().getColor(R.color.colorPolyLineOrange))
-                .width(POLYLINE_WIDTH)
-                .clickable(false)
-                .addAll(readEncodedPolyLinePointsFromCSV(this, LINE_ORANGE)));
-        // Add a green Polyline.
-        mMap.addPolyline(new PolylineOptions()
-                .color(getResources().getColor(R.color.colorPolyLineGreen))
-                .width(POLYLINE_WIDTH)
-                .clickable(false)
-                .addAll(readEncodedPolyLinePointsFromCSV(this, LINE_GREEN)));
-        // Add a pink Polyline.
-        mMap.addPolyline(new PolylineOptions()
-                .color(getResources().getColor(R.color.colorPolyLinePink))
-                .width(POLYLINE_WIDTH)
-                .clickable(false)
-                .addAll(readEncodedPolyLinePointsFromCSV(this, LINE_PINK)));
+            PolylineOptions options = new PolylineOptions()
+                    .width(2)
+                    .color(Color.BLUE)
+                    .addAll(list);
+            mMap.clear();
+            mMap.addPolyline(options);
+
+            /**
+            //add LatLngBounds
+            LatLngBounds.Builder builder = new LatLngBounds.Builder();
+//            builder.include(depart_loc);
+//            builder.include(destination_loc);
+            for (LatLng latLng : list) {
+                builder.include(latLng);
+            }
+            LatLngBounds bounds = builder.build();
+            int width = getResources().getDisplayMetrics().widthPixels;
+            int height = getResources().getDisplayMetrics().heightPixels;
+            int padding = (int) (height * 0.20);
+            CameraUpdate cu = CameraUpdateFactory.newLatLngBounds(bounds, width, height, padding);
+            mMap.animateCamera(cu);
+             */
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 }

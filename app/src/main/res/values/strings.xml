@@ -1,11 +1,11 @@
 <resources>
     <string name="app_name">Peta Cuaca App</string>
-    <string name="url">http://10.0.2.2/petacuaca/public/</string>
+    <string name="url">http://petacuaca.husein-it.xyz/</string>
     <string name="url_local">http://10.0.2.2/petacuaca/public/</string>
     <string name="url_production">http://petacuaca.husein-it.xyz/</string>
     <string name="client_id">1</string>
     <string name="client_secret">rXY1IOzNy5WmIc1cEvKJFE4E6ay7htvXo7KUhkpH</string>
-    <string name="google_api_key">AIzaSyAlecnCIKqVVgTshKPJDb8jrqbgZ4txpDk</string>
+    <string name="google_api_key">AIzaSyBoMtFEN74d2BdwY2oU80rNQiUGWXuXdiQ</string>
 
     <!--  MainActivity -->
     <string name="main_login_btn">Masuk</string>
@@ -46,8 +46,6 @@
     <string name="input_arrive_time_input">Waktu Sampai Anda</string>
     <string name="input_search_btn">Cari Rute</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
-    <string name="title_activity_maps">Map</string>
-
+    <!-- MapActivity -->
+    <string name="map_subtitle">Rekomendasi Rute</string>
 </resources>
